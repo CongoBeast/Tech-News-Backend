@@ -5,8 +5,6 @@ const cors = require('cors');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('./User');
-const mongoose = require('mongoose');
 
 const app = express();
 const PORT = 3001;
@@ -34,16 +32,10 @@ const generateId = () => {
 const generateToken = (userId) => {
   const secretKey = 'your-secret-key'; // Replace with your own secret key
   const expiresIn = '1h'; // Token expiration time, e.g., 1 hour
-
-  const payload = {
-    sub: userId, // Subject of the token (typically the user ID)
-    iat: Math.floor(Date.now() / 1000), // Issued at time (current time in seconds)
+  const payload = { sub: userId,  iat: Math.floor(Date.now() / 1000), // Issued at time (current time in seconds)
   };
-
-  const token = jwt.sign(payload, secretKey, { expiresIn });
-  return token;
+  return jwt.sign(payload, secretKey, { expiresIn });;
 };
-
 
 const axiosInstance = axios.create({
   baseURL: apiConfig.urlBase,
@@ -295,6 +287,48 @@ app.get('/funding-news', (req, res) => {
   axios({ ...apiConfig, url: `${apiConfig.urlBase}find`, data })
     .then(response => {
       res.json(response.data.documents);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      res.status(500).send(error);
+    });
+});
+
+
+app.post('/update-funding-entry', (req, res) => {
+  const fundingData = req.body;
+
+  const data = JSON.stringify({
+    "collection": "FundingNews",
+    "database": "thomastshuma43",
+    "dataSource": "Cluster0",
+    "filter": { "_id": fundingData._id },
+    "update": { "$set": fundingData }
+  });
+
+  axios({ ...apiConfig, url: `${apiConfig.urlBase}updateOne`, data })
+    .then(response => {
+      res.json(response.data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      res.status(500).send(error);
+    });
+});
+
+app.post('/delete-funding-entry', (req, res) => {
+  const { _id } = req.body;
+
+  const data = JSON.stringify({
+    "collection": "FundingNews",
+    "database": "thomastshuma43",
+    "dataSource": "Cluster0",
+    "filter": { "_id": _id }
+  });
+
+  axios({ ...apiConfig, url: `${apiConfig.urlBase}deleteOne`, data })
+    .then(response => {
+      res.json(response.data);
     })
     .catch(error => {
       console.error('Error:', error);
