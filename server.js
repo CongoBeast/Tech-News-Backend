@@ -336,6 +336,26 @@ app.post('/delete-funding-entry', (req, res) => {
     });
 });
 
+app.post('/submit-link', (req, res) => {
+  const { link } = req.body;
+
+  const data = JSON.stringify({
+    "collection": "ArticleLinks",
+    "database": "thomastshuma43",
+    "dataSource": "Cluster0",
+    "document": { link }
+  });
+
+  axios({ ...apiConfig, url: `${apiConfig.urlBase}insertOne`, data })
+    .then(response => {
+      res.status(200).json(response.data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      res.status(500).send(error);
+    });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
