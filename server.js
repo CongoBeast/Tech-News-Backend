@@ -337,13 +337,18 @@ app.post('/delete-funding-entry', (req, res) => {
 });
 
 app.post('/submit-link', (req, res) => {
+  // const { link } = req.body;
   const { link } = req.body;
+  const linkDocument = {
+    _id: generateId(),
+    link
+  };
 
   const data = JSON.stringify({
     "collection": "ArticleLinks",
     "database": "thomastshuma43",
     "dataSource": "Cluster0",
-    "document": { link }
+    "document": linkDocument
   });
 
   axios({ ...apiConfig, url: `${apiConfig.urlBase}insertOne`, data })
