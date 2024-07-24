@@ -379,6 +379,26 @@ app.get('/article-links', (req, res) => {
     });
 });
 
+app.post('/delete-links', (req, res) => {
+  const { _id } = req.body;
+
+  const data = JSON.stringify({
+    "collection": "ArticleLinks",
+    "database": "thomastshuma43",
+    "dataSource": "Cluster0",
+    "filter": { "_id": _id }
+  });
+
+  axios({ ...apiConfig, url: `${apiConfig.urlBase}deleteOne`, data })
+    .then(response => {
+      res.json(response.data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      res.status(500).send(error);
+    });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
