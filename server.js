@@ -361,6 +361,24 @@ app.post('/submit-link', (req, res) => {
     });
 });
 
+app.get('/article-links', (req, res) => {
+  const data = JSON.stringify({
+    "collection": "ArticleLinks",
+    "database": "thomastshuma43",
+    "dataSource": "Cluster0",
+    "filter": {}
+  });
+
+  axios({ ...apiConfig, url: `${apiConfig.urlBase}find`, data })
+    .then(response => {
+      res.json(response.data.documents);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      res.status(500).send(error);
+    });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
