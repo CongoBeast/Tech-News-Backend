@@ -62,6 +62,30 @@ app.post('/summarize-article', async (req, res) => {
   }
 });
 
+app.post('/summarize-company', async (req, res) => {
+  const { link } = req.body;
+
+  try {
+    const chatSession = model.startChat({
+      generationConfig, // Ensure this is defined elsewhere in your code
+      history: [
+        {
+          role: "user",
+          parts: [
+            { text: `i want a you to summarize what a company does based on their link in one not too long not too short paragraph, no citations. Return in a JSON format an array with the company name, the summary, and the careers page link. If there is none, provide a social media link.` },
+          ],
+        },
+      ],
+    });
+
+    const result = await chatSession.sendMessage(link);
+    res.json({ summary: result.response.text() });
+    // console.log(res.json({ summary: JSON.parse(result.response.text()) }))
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 const apiConfig = {
   method: 'post',
   headers: {
