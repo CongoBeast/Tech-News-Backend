@@ -5,15 +5,62 @@ const cors = require('cors');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const {
+  GoogleGenerativeAI,
+  HarmCategory,
+  HarmBlockThreshold,
+} = require("@google/generative-ai");
+
+const apiKey = "AIzaSyDhfeanHiRbyV0Vyrp7_YSgfvN5NTzY_PI";
+const genAI = new GoogleGenerativeAI(apiKey);
+
+const model = genAI.getGenerativeModel({
+  model: "gemini-1.5-flash",
+});
+
+const generationConfig = {
+  temperature: 1,
+  topP: 0.95,
+  topK: 64,
+  maxOutputTokens: 8192,
+  responseMimeType: "text/plain",
+};
 
 const app = express();
 const PORT = 3001;
+app.use(express.json());
 
 const JWT_SECRET = 'your_jwt_secret'; // Use a strong, secret key in production
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
+
+app.post('/summarize-article', async (req, res) => {
+  const { link } = req.body;
+  // console.log(link)
+
+  try {
+    const chatSession = model.startChat({
+      generationConfig,
+      history: [
+        {
+          role: "user",
+          parts: [
+            { text: `Here is the link to the article: ${link}. Summarize the article in one mid-sized paragraph, and add a good short creative title, return as an array with first item being the title and second being the text.` },
+          ],
+        },
+      ],
+    });
+
+    const result = await chatSession.sendMessage(link);
+    // console.log(JSON.parse(result.response.text()))
+    // console.log("stuff")
+    res.json({ summary: result.response.text() });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 const apiConfig = {
   method: 'post',
