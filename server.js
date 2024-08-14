@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const axios = require('axios');
 const cors = require('cors');
 const crypto = require('crypto');
+const moment = require('moment');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const {
@@ -235,11 +236,18 @@ app.post('/submit-article', (req, res) => {
 });
 
 app.get('/get-articles', (req, res) => {
+
+  const startOfMonth = moment().startOf('month').toISOString();
+  const endOfMonth = moment().endOf('month').toISOString();
+  
   const data = JSON.stringify({
     "collection": "TechNews",
     "database": "thomastshuma43",
     "dataSource": "Cluster0",
-    "filter": {}
+    "filter": {
+        "$gte": { "$date": startOfMonth },
+        "$lt": { "$date": endOfMonth }
+    }
   });
 
   axios({ ...apiConfig, url: `${apiConfig.urlBase}find`, data })
