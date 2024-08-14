@@ -245,7 +245,7 @@ app.get('/get-articles', (req, res) => {
     "database": "thomastshuma43",
     "dataSource": "Cluster0",
     // "filter": {}
-    "aggregate": [
+    "pipeline": [
       {
         "$match": {
           "date": {
