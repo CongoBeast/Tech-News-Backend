@@ -383,14 +383,46 @@ app.post('/submit-funding-news', (req, res) => {
 
 
 app.get('/funding-news', (req, res) => {
+
+  const filter = req.query.filter; // Get the filter from the request
+  const pipeline = [];
+
+  // Determine the date range based on the filter
+  if (filter === 'thisMonth') {
+    const startOfMonth = moment().startOf('month').toISOString();
+    const endOfMonth = moment().endOf('month').toISOString();
+    pipeline.push({
+      "$match": {
+        "date": {
+          "$gte": new Date(startOfMonth),
+          "$lt": new Date(endOfMonth)
+        }
+      }
+    });
+  } else if (filter === 'lastMonth') {
+    const startOfLastMonth = moment().subtract(1, 'months').startOf('month').toISOString();
+    const endOfLastMonth = moment().subtract(1, 'months').endOf('month').toISOString();
+    pipeline.push({
+      "$match": {
+        "date": {
+          "$gte": new Date(startOfLastMonth),
+          "$lt": new Date(endOfLastMonth)
+        }
+      }
+    });
+  }
+
+  
   const data = JSON.stringify({
     "collection": "FundingNews",
     "database": "thomastshuma43",
     "dataSource": "Cluster0",
-    "filter": {}
+    // "filter": {}
+    "pipeline": pipeline
   });
 
-  axios({ ...apiConfig, url: `${apiConfig.urlBase}find`, data })
+  // axios({ ...apiConfig, url: `${apiConfig.urlBase}find`, data })
+  axios({ ...apiConfig, url: `${apiConfig.urlBase}aggregate`, data })
     .then(response => {
       res.json(response.data.documents);
     })
