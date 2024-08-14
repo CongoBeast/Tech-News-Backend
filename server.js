@@ -237,24 +237,43 @@ app.post('/submit-article', (req, res) => {
 
 app.get('/get-articles', (req, res) => {
 
-  const startOfMonth = moment().startOf('month').toISOString();
-  const endOfMonth = moment().endOf('month').toISOString();
+  const filter = req.query.filter; // Get the filter from the request
+  const pipeline = [];
+
+  // Determine the date range based on the filter
+  if (filter === 'thisMonth') {
+    const startOfMonth = moment().startOf('month').toISOString();
+    const endOfMonth = moment().endOf('month').toISOString();
+    pipeline.push({
+      "$match": {
+        "date": {
+          "$gte": new Date(startOfMonth),
+          "$lt": new Date(endOfMonth)
+        }
+      }
+    });
+  } else if (filter === 'lastMonth') {
+    const startOfLastMonth = moment().subtract(1, 'months').startOf('month').toISOString();
+    const endOfLastMonth = moment().subtract(1, 'months').endOf('month').toISOString();
+    pipeline.push({
+      "$match": {
+        "date": {
+          "$gte": new Date(startOfLastMonth),
+          "$lt": new Date(endOfLastMonth)
+        }
+      }
+    });
+  }
+
+  // const startOfMonth = moment().startOf('month').toISOString();
+  // const endOfMonth = moment().endOf('month').toISOString();
   
   const data = JSON.stringify({
     "collection": "TechNews",
     "database": "thomastshuma43",
     "dataSource": "Cluster0",
     // "filter": {}
-    "pipeline": [
-      {
-        "$match": {
-          "date": {
-            "$gte": new Date(startOfMonth),
-            "$lt": new Date(endOfMonth)
-          }
-        }
-      }
-      ]
+    "pipeline": pipeline
   });
 
   // axios({ ...apiConfig, url: `${apiConfig.urlBase}find`, data })
