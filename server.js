@@ -244,20 +244,17 @@ app.get('/get-articles', (req, res) => {
     "collection": "TechNews",
     "database": "thomastshuma43",
     "dataSource": "Cluster0",
-    "filter": {
-        // "$gte": { "$date": startOfMonth },
-        // "$lt": { "$date": endOfMonth }
-    }
-    // "pipeline": [
-    //   {
-    //     "$match": {
-    //       "date": {
-    //         "$gte": { "$date": startOfMonth },
-    //         "$lt": { "$date": endOfMonth }
-    //       }
-    //     }
-    //   }
-    // ]
+    // "filter": {}
+    "aggregate": [
+      {
+        "$match": {
+          "date": {
+            "$gte": new Date(startOfMonth),
+            "$lt": new Date(endOfMonth)
+          }
+        }
+      }
+      ]
   });
 
   // axios({ ...apiConfig, url: `${apiConfig.urlBase}find`, data })
