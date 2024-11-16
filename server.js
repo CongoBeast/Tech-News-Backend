@@ -16,7 +16,7 @@ const apiKey = "AIzaSyDhfeanHiRbyV0Vyrp7_YSgfvN5NTzY_PI";
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
+  model: "gemini-1.5-pro",
 });
 
 const generationConfig = {
@@ -58,6 +58,7 @@ app.post('/summarize-article', async (req, res) => {
     // console.log(JSON.parse(result.response.text()))
     // console.log("stuff")
     res.json({ summary: result.response.text() });
+    
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
