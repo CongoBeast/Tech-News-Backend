@@ -56,7 +56,8 @@ app.post('/summarize-article', async (req, res) => {
 
     const result = await chatSession.sendMessage(link);
     // console.log(JSON.parse(result.response.text()))
-    // console.log("stuff")
+    console.log(res.json({ summary: result.response.text() }))
+    
     res.json({ summary: result.response.text() });
     
   } catch (error) {
